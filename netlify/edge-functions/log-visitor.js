@@ -34,7 +34,7 @@ export default async (request, context) => {
 
   console.log('VISITOR', JSON.stringify(entry));
 
-  await fetch('YOUR_MAKE_WEBHOOK_URL', {
+  await fetch('https://hook.us2.make.com/ry2glng24ez0lsifcrf9b31ovjcptk88', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(entry),
