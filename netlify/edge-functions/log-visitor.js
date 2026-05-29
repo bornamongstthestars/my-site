@@ -1,7 +1,3 @@
-// netlify/edge-functions/log-visitor.js
-// Runs server-side on every POST to /api/log-visitor
-// Captures the raw IP before it ever reaches the browser
-
 export default async (request, context) => {
 
   const ip =
@@ -14,21 +10,19 @@ export default async (request, context) => {
   const entry = {
     time:      new Date().toISOString(),
     ip,
-    city:      geo.city      ?? null,
+    city:      geo.city ?? null,
     country:   geo.country?.name ?? null,
     userAgent: request.headers.get('user-agent'),
     referrer:  request.headers.get('referer') ?? null,
   };
 
-  // Print to Netlify Function Logs (free, view in dashboard)
   console.log('VISITOR', JSON.stringify(entry));
 
-  // ─── Optional: forward to a webhook (e.g. Pipedream / Make) ───
-  // await fetch('https://your-webhook-url.com', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(entry),
-  // });
+  await fetch('https://hook.us2.make.com/ry2glng24ez0lsifcrf9b31ovjcptk88', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry),
+  });
 
   return new Response('ok', {
     status: 200,
