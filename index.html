@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Name</title>
+
+  <!-- ① Google Analytics 4 — replace G-XXXXXXXXXX -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+
+  <!-- ② Microsoft Clarity — replace YOUR_CLARITY_ID -->
+  <script>
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window,document,"clarity","script","YOUR_CLARITY_ID");
+  </script>
+
+  <style>
+    /* paste any CSS you like here */
+    body { font-family: sans-serif; text-align: center; padding: 60px 20px; }
+    h1   { font-size: 2rem; margin-bottom: 8px; }
+    p    { color: #666; margin-bottom: 32px; }
+    .links { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto; }
+    .links a {
+      display: block; padding: 14px 20px;
+      border: 1px solid #ddd; border-radius: 12px;
+      text-decoration: none; color: inherit; font-weight: 500;
+      transition: background 0.2s;
+    }
+    .links a:hover { background: #f5f5f5; }
+  </style>
+</head>
+<body>
+
+  <h1>Your Name</h1>
+  <p>A line about you ✨</p>
+
+  <div class="links">
+    <a href="https://instagram.com/yourhandle" data-link="instagram">Instagram</a>
+    <a href="https://yourportfolio.com"        data-link="portfolio">Portfolio</a>
+    <a href="mailto:you@email.com"             data-link="email">Email me</a>
+  </div>
+
+  <script>
+    // ③ Log raw IP via edge function on every page load
+    fetch('/api/log-visitor', { method: 'POST' });
+
+    // ④ Track every link click in GA4
+    document.querySelectorAll('[data-link]').forEach(el => {
+      el.addEventListener('click', () => {
+        gtag('event', 'link_click', {
+          link_name: el.dataset.link,
+          link_url:  el.href
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
