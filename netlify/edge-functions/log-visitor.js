@@ -7,6 +7,21 @@ export default async (request, context) => {
 
   const geo = context.geo ?? {};
 
+  // Query ip-api for VPN/proxy detection
+  let vpnData = {};
+  try {
+    const ipCheck = await fetch(
+      `http://ip-api.com/json/${ip}?fields=status,country,city,isp,org,as,proxy,vpn,hosting`
+    ).then(r => r.json());
+    vpnData = {
+      isp:     ipCheck.isp,
+      org:     ipCheck.org,
+      isProxy: ipCheck.proxy,
+      isVPN:   ipCheck.vpn,
+      isHosting: ipCheck.hosting,
+    };
+  } catch(e) {}
+
   const entry = {
     time:      new Date().toISOString(),
     ip,
@@ -14,11 +29,12 @@ export default async (request, context) => {
     country:   geo.country?.name ?? null,
     userAgent: request.headers.get('user-agent'),
     referrer:  request.headers.get('referer') ?? null,
+    ...vpnData,
   };
 
   console.log('VISITOR', JSON.stringify(entry));
 
-  await fetch('https://hook.us2.make.com/ry2glng24ez0lsifcrf9b31ovjcptk88', {
+  await fetch('YOUR_MAKE_WEBHOOK_URL', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(entry),
