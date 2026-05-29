@@ -1,0 +1,8 @@
+# netlify.toml — tells Netlify where your edge functions live
+
+[build]
+  publish = "."          # your HTML is at the root
+
+[[edge_functions]]
+  path    = "/api/log-visitor"
+  function = "log-visitor"
